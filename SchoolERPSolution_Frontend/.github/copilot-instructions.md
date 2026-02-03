@@ -1,0 +1,21 @@
+# Copilot Instructions for schoolerp-dashboard
+
+- Overview: Vite + React 19 TypeScript SPA; entry mounts in [index.tsx](../index.tsx) and renders root shell from [App.tsx](../App.tsx). No router—module switching is local state.
+- Run/Build: Install with npm install, set GEMINI_API_KEY in .env.local if Gemini features are used, run npm run dev/build/preview (Vite 6). See [README.md](../README.md).
+- Styling tokens: Tailwind CDN config in [index.html](../index.html) defines primary/background/card/text colors, animations, Inter font, and Material Icons Outlined. Prefer these utility tokens over raw hex.
+- Theming: Class-based dark mode toggled in [components/Navbar.tsx](../components/Navbar.tsx); persisted via localStorage key theme on document.documentElement.
+- Data sources: Module cards and tenant branding live in [constants.ts](../constants.ts) with shapes in [types.ts](../types.ts); [components/admin/InstituteProfile.tsx](../components/admin/InstituteProfile.tsx) mutates in-memory SCHOOL_DATA (mock persistence).
+- Module cards: [components/ModuleCard.tsx](../components/ModuleCard.tsx) expects ModuleData.styles.* for hover/brand behavior; extend DASHBOARD_MODULES instead of hardcoding per-card styles.
+- Global navigation: [App.tsx](../App.tsx) owns activeModule, activeSchoolId, commOpenThreadId; handleModuleClick maps module titles to layouts and handleMessageClick opens Communication (optionally targeting a thread).
+- Communication deep link: [components/CommunicationLayout.tsx](../components/CommunicationLayout.tsx) opens inbox when initialThreadId is set; Navbar message dropdown passes ids through onMessageClick to preserve this flow.
+- Layout patterns: Academics/Admissions/Communication/Student layouts use nav arrays + renderContent switches; add views by updating the nav array and switch together (see [components/academics/AcademicsLayout.tsx](../components/academics/AcademicsLayout.tsx)).
+- Mobile UX: Layouts ship mobile headers, bottom navs, and slide-in drawers; keep print:hidden markers and sticky top-[65px] offsets for navigability.
+- Navbar behaviors: Search filters DASHBOARD_MODULES and MOCK_PEOPLE_SEARCH, invoking onSearchNavigation on selection; brand block jumps to Institute Profile; dropdowns close via document mousedown listeners and refs.
+- Icons: Use span.material-icons-outlined with icon names for consistency; avoid mixing custom SVG packs.
+- Design consistency: Use text-text-main-* and text-text-sub-* tokens with card-light/card-dark backgrounds from [index.html](../index.html); avoid ad hoc colors.
+- Mocked data: All modules currently display static lists/stats; prefer extending mock arrays over adding fetch calls until backend exists.
+- Adding modules/layouts: Extend DASHBOARD_MODULES and ModuleData, wire title mapping in handleModuleClick, ensure Navbar search finds the new title, and add view cases in the target layout.
+- Avoid: Introducing React Router without redesigning App state, removing theme/documentElement handling, or mutating shared constants without updating dependent nav/search logic.
+- Dependencies: Minimal stack (react, react-dom, vite, @vitejs/plugin-react, typescript); no test harness configured.
+- Files of interest: App shell [App.tsx](../App.tsx); styling tokens [index.html](../index.html); nav/search/theming [components/Navbar.tsx](../components/Navbar.tsx); module definitions [constants.ts](../constants.ts); types [types.ts](../types.ts); layout patterns [components/academics/AcademicsLayout.tsx](../components/academics/AcademicsLayout.tsx) and [components/CommunicationLayout.tsx](../components/CommunicationLayout.tsx); branding admin [components/admin/InstituteProfile.tsx](../components/admin/InstituteProfile.tsx).
+- If any workflow or convention is unclear, tell me what to expand and I will iterate this doc.
