@@ -42,6 +42,7 @@ const NAV_ITEMS: { id: AdmissionsView; label: string; icon: string; category?: s
 
 export const AdmissionsLayout: React.FC<AdmissionsLayoutProps> = ({ onBack }) => {
   const [activeView, setActiveView] = useState<AdmissionsView>('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeView) {
@@ -131,6 +132,70 @@ export const AdmissionsLayout: React.FC<AdmissionsLayoutProps> = ({ onBack }) =>
         </div>
         {renderContent()}
       </main>
+
+      {/* Mobile Bottom Navigation - HIDDEN ON PRINT */}
+      <div className="print:hidden md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 flex justify-between px-6 py-2 z-40 safe-area-bottom">
+        {NAV_ITEMS.slice(0, 4).map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveView(item.id)}
+            className={`flex flex-col items-center gap-1 p-1 rounded-lg ${activeView === item.id ? 'text-primary' : 'text-text-sub-light dark:text-text-sub-dark'}`}
+          >
+            <span className="material-icons-outlined">{item.icon}</span>
+            <span className="text-[10px] font-medium">{item.label}</span>
+          </button>
+        ))}
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="flex flex-col items-center gap-1 p-1 text-text-sub-light dark:text-text-sub-dark"
+        >
+          <span className="material-icons-outlined">menu</span>
+          <span className="text-[10px] font-medium">More</span>
+        </button>
+      </div>
+
+      {/* Mobile Menu Drawer (Overlay) - HIDDEN ON PRINT */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden print:hidden">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-3/4 bg-card-light dark:bg-card-dark p-6 overflow-y-auto shadow-xl animate-slide-in-right">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold text-text-main-light dark:text-text-main-dark">Admissions Menu</h2>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                <span className="material-icons-outlined text-text-main-light dark:text-text-main-dark">close</span>
+              </button>
+            </div>
+            <div className="space-y-6">
+              {categoryOrder.map((category) => (
+                <div key={category}>
+                  <h3 className="mb-3 text-xs font-semibold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider">
+                    {category}
+                  </h3>
+                  <div className="space-y-2">
+                    {groupedItems[category]?.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveView(item.id);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border ${
+                          activeView === item.id 
+                            ? 'bg-primary/5 border-primary/20 text-primary' 
+                            : 'bg-gray-50 dark:bg-gray-800/50 border-transparent text-text-main-light dark:text-text-main-dark'
+                        }`}
+                      >
+                        <span className="material-icons-outlined">{item.icon}</span>
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
